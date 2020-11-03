@@ -45,4 +45,19 @@ another way to create matrices (right then down):
   
 Metadata about matrices: class(), dim(), names(), rownames(), colnames()
   dim(): "returns a vector containing the      number of rows at index position 1 and       number of columns at index position 2"
+  
+The structure {str()} command can be applied   to any data structure to provide details     about that object. This is incredibly        useful!
 
+Array: more general data structure, of which   a vector (with 1 implicit dimension) and a   matrix (with 2 defined dimensions) are but   examples; arrays can include additional      dimensions, but (like vectors and matrices)   the can only include elements that all of    the same atomic data class (eg numeric,      characters).
+Construction of a 3-dimensional array with 5   rows, 6 columns, and 3 "levels":
+  a <- array(data=1:90, dim=c(5,6,3))
+
+Subsetting: elements from vectors, matrices,   and arrays can be selected by subsetting     them using their index position(s) in        bracket notation. 
+For vectors, you would specify an index        value in one dimension. For example:
+  v <- 1:100
+  Select the first 15 elements: v[1:15]
+  Give a vector of index values to use to      subset: v[c(2,4,6,8,10)]
+  Use a function or a calculation to subset a   vector: v <- 101:200
+  v[seq(from = 1, to = 100, by = 2)]
+For matrices, you would give the index         values in two dimensions.
+For arrays generally, you would give index     values for each dimension in the array.
