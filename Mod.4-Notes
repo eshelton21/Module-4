@@ -61,3 +61,10 @@ For vectors, you would specify an index        value in one dimension. For examp
   v[seq(from = 1, to = 100, by = 2)]
 For matrices, you would give the index         values in two dimensions.
 For arrays generally, you would give index     values for each dimension in the array.
+
+stringr:
+https://stringr.tidyverse.org/
+  x <- c("why", "video", "cross", "extra",     "deal", "authority")
+  str_length(x)
+  > [1] 3 5 5 5 4 9
+  
