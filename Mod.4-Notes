@@ -68,3 +68,73 @@ https://stringr.tidyverse.org/
   str_length(x)
   > [1] 3 5 5 5 4 9
   
+Subsetting challenges
+  m <- matrix(data=1:80,nrow=8,ncol=10,byrow=FALSE)
+  extract element in row 4, column 5: x <- m[4,5]
+  extract column 3: x<-m[,3]
+  
+Overwriting:
+  You can replace elements in a vector or matrix, or even entire rows or columns, by identifying the elements to be replaced and then assigning them new values.
+  m[7,1]<-564 = replaces a single value
+  m[,8]<-2 = replaces a column
+  m[2:5,4:8]<-1 = replaces a smaller box inside the array, rows 2-5 and columns 4-8
+  m[2:5,4:8]<-c(20,19,18,17) = replaces a smaller box inside the array, row 2 in columns 4-8 get 20, row 3 in columns 4-8 get 19, etc
+  m[2:5,4:8] <- matrix(data = c(20:1), nrow=4,ncol=5,byrow=TRUE) = replaces a smaller box inside the array, starting at 2,4 at 20 and ending at 5,8 with 1
+  m[,8] <- c("a","b") = puts quotations around every number, replaces column 8 with alternating "a" and "b"
+  
+  Lists:
+  Lists and data frames, unlike vectors, matrices, and arrays, can be used to group together a mix of R structures and objects. A single list could contain a matrix, vector of character strings, vector of factors, an array, even another list.
+  Lists are created using the list() function where the elements to add to the list are given as arguments to the function, separated by commas.
+  s <- c("this","is","a","vector","of","strings") = a vector
+  m <- matrix(data=1:40, nrow=5, ncol=8) = a matrix
+  b <- FALSE = a logical statement
+  l <- list(s, m, b) = this puts them all in a list, s=[[1]], m=[[2]], b=[[3]]
+  l[[2]] = extracting the matrix from the list, double brackets needed
+  l[[2]][2,6] = extracting a specific number from the matrix
+  l[1:2] = slicing the list so it only has the first and second elements
+  l[c(1,3)] = only taking the first and third elements
+  str(l) = provides details on the three elements of the list
+  names(l)<-c("string","matrix","logical") = adds a name attribute to each list item
+  l$string = using the name of an item in the list to refer to it
+  l$matrix[3,5] = calling the 3,5 entry of the matrix
+  Challenge: lists can be used as elements in a list, which can nest items
+  
+  Data frames:
+  A data frame is perhaps the most useful, and most familiar, data structure that we can operate within R as it most closely aligns with how we tend to represent tabular data, with rows as 'cases' or 'observations' and columns as 'variables' describing those observations, eg a measure of a particular type. Variables tend to be measured using the same units and thus fall into the same data class and can be though of as analogous to vectors. 
+  The data.frame() command can be used to create dataframes from scratch.
+  df <- data.frame(firstName=c("Nitin","Silvy","Ingrid","Claire"), program=c("iSchool","Anthro","Anthro","EEB"), sex=c("M","F","F","F"), yearInProgram=c(1,2,2,3)) = creates a dataframe 
+  More commonly we read tabular data into R, which typically results in the table being represented as a dataframe. This will read from the file 'random-people.csv' stored on a user's desktop.
+  df <- read.csv("~/Desktop/random-people.csv", sep =",", header = TRUE, stringsAsFactors = FALSE) = my computer doesn't have this file but here's the situation
+  df[,c(1,3,4,11,12)] = only print select columns
+  str(df) = lists the observations in variables
+  df[,3] = select and subset dataframes using bracket notation. Named columns from a dataframe can be selected using the $ operator
+  str(df[,3]) = returns a vector of data in column 3
+  df$name.last = listing the last names
+  str(df$name.last) = returns a vector of data for column 'name.last'
+  df[3] = lists column 3
+  str(df[3]) = returns a dataframe of data from column 3
+  df["name.last"] = lists a column of 'name.last'
+  str(df["name.last"]) = returns a dataframe of data for column 'name.last'
+  You can add rows, additional cases, or columns, additional variables, to a dataframe using rbind() and cbind(). Alternatively, you can extend a dataframe by adding a new variable directly using the $ operator. Note: cbind() results in the item being added as a factor while using the $ operator results in the item being added as a character vector. You can see this by using the str() command. A factor is another atomic data class for R for dealing efficiently with nominal variables, usually character strings. Internally, R assigns integer values to each unique string, eg 1 for 'female', 2 for 'male, etc.
+  
+  Filtering
+  Logical filters may also be used to subset dataframes. Here, we subset the dataframe for only those rwos where the variable school is 'BU':
+  new_df<-df[df$school=="BU",]
+  In this case, R evaluates the expression 'df$school=="BU"' and returns a logical vector equal in length to the number of rows in df. It then subsets df based on that vector, returning only rows that evaluate to TRUE. We can also choose to only return particular columns when we subset.
+  new_df<-df[df$school=="BU",c("name.last","name.first","school")]
+  
+  Factors, Conversion and Coercion, and Special Data Values
+  We were introduced to the factor data class above. Again, factors are numeric codes that R can use internally that correspond to character value 'levels'. When we load in data frm an external source, R tends to import character string data as factors, assigning to each unique string to an integer numeric code and assigning the string as a 'label' for that code. Using factors can make some code run much more quickly, eg ANOVA, ANCOVA, and other forms of regression using categorical variables. 
+  You can also convert factor to character data, and vice versa, using the as.character() or as.factor() commands. You can also convert/coerce any vector to a different class using similar constructs, eg as.numeric(), although not all such conversions are really meaningful. Converting factor data to numeric results in the converted data having the value of R's internal numeric code for the factor level, while converting character data to numeric results in the data being coerced into the special data value of NA for missing data.
+  R has three special data values that it uses in a variety of situations:
+  NA = 'not available', is used for missing data
+  na.rm=TRUE = removes NAs from a calculation, offered by many statistical functions
+  Inf and -Inf = used when the result of a numerical calculation is too extreme for R to express
+  NaN = 'not a number', used when R cannot express the results of a calculation, eg when you try to take the square root of a negative number.
+  
+  Challenge 5:
+  Store the following numbers as a 5x3 matrix: 3, 0, 1, 23, 1, 2, 33, 1, 1, 42, 0, 1, 41, 0, 2. Fill the matrix row-wise. m<-matrix(data=c(3,0,1,23,1,2,33,1,1,42,0,1,41,0,2),nrow=5,ncol=3,byrow=TRUE)
+  Coerce the matrix to a dataframe: df<-as.data.frame(m)
+  As a dataframe, coerce the second column to be logical-valued: df[,2]<-as.logical(df$V2) will make the whole dataframe with logical-valued col2 be the output of df. df<-as.logical(df$V2) will make logical-valued col2 be the only output of df. 
+  As a dataframe, coerce the third column to be factor-valued: df[,3]<-as.factor(df$V3).
+  When you are done, use the str() command to show the data type for each variable in your dataframe. str(df[,1]) = col1. str(df[,2]) = col2. str(df[,3]) = col3.
