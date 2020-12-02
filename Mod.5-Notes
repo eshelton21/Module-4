@@ -1,0 +1,36 @@
+---
+title: "Mod.5-Notes"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+Loading Different Types of Plain Text Files
+  In R, we can load a data set from a plain text file using the read.table() function from the {base} package, with the path to the file as the first, file=, argument for the function. An additional argument, header=, can be used to specify whether the first row of the data file consists of column/field names.
+  The generic read.table() function can be used to read data files where columns are separated by tabs, commas, white space, or some other delimeter. The sep= argument tells R what character is used as a delimeter. The skip= argument can be used to start reading a file after a set number of rows. 
+  There are format-specific variants of read.table(), eg. read.csv(), that have different defaults and may be quicker for certain file types. Note that when using this function from the {base} package, the argument stringsAsFactors is set to be TRUE by default, and we need to set it as FALSE if you want character strings to be loaded as actual strings.
+  
+Reading from a local file
+  The file.choose() command is useful and gives you a familiar dialog box to select a file. You can use this to specify the path to a locally-stored file.
