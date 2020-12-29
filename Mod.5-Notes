@@ -34,6 +34,9 @@ Loading Different Types of Plain Text Files
   
 Reading from a local file
   The file.choose() command is useful and gives you a familiar dialog box to select a file. You can use this to specify the path to a locally-stored file.
-  f<-file.choose("~/OneDrive/Documents/Github/Module-4/CPDSt"); this selects the file and sets it as f.
+  f<-file.choose("~/OneDrive/Documents/Github/Module-4/CPDSt"); this opens a window to select the file and set it as f.
   d <- read.table(f, header = TRUE, sep ="\t", stringsAsFactors = FALSE); error message: Error in scan(file = file, what = what, sep = sep, quote = quote, dec = dec,  : 
   line 110 did not have 20 elements.
+  Potential fix: fill = TRUE argument within parentheses; it's working so far.
+  head(d): shows the first 6 lines of data for all columns. Line amount can be modified with bracket notation, eg head(d) [1:10]
+  tail(d): shows to last 6 lines of data for all columns.
