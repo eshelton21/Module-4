@@ -40,3 +40,104 @@ Reading from a local file
   Potential fix: fill = TRUE argument within parentheses; it's working so far.
   head(d): shows the first 6 lines of data for all columns. Line amount can be modified with bracket notation, eg head(d) [1:10]
   tail(d): shows to last 6 lines of data for all columns.
+  class(d): shows that tables are typically loaded as dataframes.
+  Alternatively; d <- read.delim(f, header = TRUE, stringsAsFactors = FALSE); then head(d)
+  Loading comma-separated {.csv} text: f<-file.choose("~/OneDrive/Documents/Github/Module-4/CPDSc"); d<-read.table(f, header = TRUE, sep = ",", stringsAsFactors = FALSE) OR d<-read.csv(f, header = TRUE, stringsAsFactors = FALSE)
+  
+Loading Excel Files
+  While you should never need to use Excel, sometimes you will no doubt be given a spreadsheet file with some data in it that you want to read in R. There are several packages available that provide functions for loading data into R from Excel spreadsheet files: {readxl}, {XLConnect}, {gdata}, and {xlsx}. The first two of these are fast, easy to use, and work well. {gdata} is a bit slower and requires that you have PERL installed someone on your computer (which it is likely to be by default). {xlsx} is much slower.
+  Note: always use str() to check if your variables come in the correct data class.
+  
+Using the {readxl} package:
+  require(readxl): Warning message:
+package ‘readxl’ was built under R version 4.0.3
+  f<-"~/Desktop/CPDS-1960-2014-reduced.xlsx": set to environment
+  d<-read_excel(f, sheet = 1, col_names = TRUE): Error: `path` does not exist: ‘~/Desktop/CPDS-1960-2014-reduced.xlsx’
+  head(d)
+  str(d)
+Using the {XLConnect} package: 
+  require(XLConnect): Error: package or namespace load    failed for ‘XLConnect’: .onLoad failed in loadNamespace() for 'rJava', details: call: fun(libname, pkgname) error: No CurrentVersion entry in Software/JavaSoft        registry! Try re-installing Java and make sure R and Java   have matching architectures. Warning message: package      ‘XLConnect’ was built under R version 4.0.3
+  NOTE: reinstalling RTools and all packages did not fix the errors. Installing rJava package did not fix the XLConnect error. Updating or installing Java did not fix the XLConnect error.
+  f <- "~/Desktop/CPDS-1960-2014-reduced.xlsx"
+  d <- readWorksheetFromFile(f, sheet = 1, header = TRUE)
+  head(d)
+  str(d)
+  The XLConnect package can also write data frames back out to Excel worksheets. If the file does not exist, it is created. If it does exist, data is cleared and overwritten, which is much slower. The conditional statement 'if (){}' will implement the file.remove() command if needed.
+  f <- "~/Desktop/output.xlsx"
+  if (file.exists(f)) {file.remove(f)}
+  writeWorksheetToFile(f, d, sheet = "myData", clearSheets = TRUE)
+  
+Loading Files Stored on a Remote Server
+  We can also load files stored on a server elsewhere on the web, eg Dropbox or Github. To read .csv or .txt wiles directly from Github, use the {curl} or {readr} packages. The URL of the raw file in the browser is what you use as an argument for the functions below.
+  
+Importing data from a file on a remote server using {curl}
+  For a .csv file: 
+    library(curl)
+    f<-curl("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/master/AN597_Fall19/CPDS-1960-2014-reduced.csv")
+    d<-read.csv(f, header = TRUE, sep = ",", stringsAsFactors = FALSE)
+    head(d)
+  For a .txt file:
+    f<-curl("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/master/AN597_Fall19/CPDS-1960-2014-reduced.txt")
+    d<-read.table(f, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+    head(d)
+    
+Importing data from a remote server using {readr}
+  library(readr)
+  .csv:
+    f<-"https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/master/AN597_Fall19/CPDS-1960-2014-reduced.csv"
+    d<-read_csv(f, col_names = TRUE): returns column specifications.
+    head(d): returns a 6x20 'tibble', a new version of a dataframe.
+  .txt:
+    f<-"https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/master/AN597_Fall19/CPDS-1960-2014-reduced.txt"
+    d<-read_tsv(f, col_names = TRUE): returns column specification.
+    head(d): returns a 6x20 tibble
+    
+Importing data from a file hosted on Dropbox 
+  To load data from a .csv located file in a personal Dropbox account, you can use the {rdrop2} package.
+    require(rdrop2)
+    drop_auth(): opens a browser dialog box to ask for authorization, needs authorization code.
+    drop_dir(): lists the contents of your dropbox folder, also opens a browser dialogue box and needs authorization code.
+    f<-"CPDS-1960-2014-reduced.csv": name of the file to read from
+    f<-drop_search(f): searches your dropbox directory for file or directory names, can be slow; opens browser dialogue box and needs authorization code.
+    f<-f$path: $path is the location of the results returned above
+    d<-drop_read_csv(f, header = TRUE, sep = ",", stringsAsFactors = FALSE)
+    head(d)
+    str(d)
+  This same process can be done to load data from other types of delimited files in Dropbox by setting the appropriate 'sep=' argument. You can also read text files from someone else's Dropbox account using a link they shared.
+    link <- "https://www.dropbox.com/s/hft09jnpjepy1a1/CPDS-1960-2014-reduced.csv?dl=0"
+  Note: shared Dropbox links will take you to a webpage that has the data embedded, to get the raw data you need to change the end of the link from dl=0 to dl=1 or raw=1.
+    link<-gsub(pattern = "dl=0", replacement = "dl=1", x = link)
+    d<-read.csv(link, header = TRUE, sep = ",", stringsAsFactors = FALSE): Error in file(file, "rt") : cannot open the connection
+In addition: Warning message:
+In file(file, "rt") : cannot open URL 'https://www.dropbox.com/s/hft09jnpjepy1a1/CPDS-1960-2014-reduced.csv?dl=1': HTTP status was '404 Not Found'
+    head(d)
+    str(d)
+  You can also use the source_data() function from the {repmis} package to load data from a Dropbox file. This function detects column types and gives a few more warnings than others if it encounters something odd.
+    require(repmis): returns 'Registered S3 method overwritten by 'R.oo':'
+    d<-source_data(link, header = TRUE, sep = ","): returns 'Downloading data from: <link>' and 'SHA-1 hash of the downloaded data file is: <>'.
+    head(d)
+    str(d)
+    
+Importing data from a Google Drive file:
+  Finally, you can also load data directly from gdrive into R using the {googledrive} or {googlesheets} packages. The most seamless way for importing a file from gdrive is to convert the file into a google sheet, ie a spreadsheet editable within the drive. Try saving the CPDS file as a google sheet in your drive, and extracting it into R using the following code. 
+    require(googlesheets)
+    gs_ls(): gives you the option to log into a google account and see options for download; google blocked it, needs an authorization code. Installed the {httpuv} package manually.
+    get_title("CPDS-1960-2014-reduced"): shows you worksheets from the sheet to which you have access.
+    d<-gs_read("CPDS-1960-2014-reduced")
+    head(d)
+    str(d)
+  Uploading files not converted to gsheets is complicated but possible. Module contains link with relevant coding, to upload the file and extract it to R.
+  
+Downloading files from a Remote Server
+  The {rdrop2} package can be used to download a file from a personal Dropbox account to your local computer, rather than just connecting to a Dropbox file to read the data stored there. This should work with any file type.
+    filename<-"<name of file>": name of file to download.
+    f<-drop_search(filename): searches your dropbox directory for that file or directory name.
+    f<-f$path: $path is the location of the results returned above.
+    drop_get(f, local_file = paste0("~/Desktop/", filename), overwrite = TRUE, progress = TRUE): this will save the file to the desktop.
+  The progress=TRUE argument gives you a reassuring progress bar. By default, the argument is set to FALSE. Note: the process works for multiple file types, including Excel. You can also download files directly into your computer from gdrive using the {googledrive} package.
+    drive_find(pattern = "CPDS-1960-2014-reduced"): identifies files that match that name.
+    drive_download("CPDS-1960-2014-reduced.csv"): should save, in this case, to your working directory.
+  Module includes link for more basics of using {googledrive} for downloading, interfacing, and formatting data.
+
+Downloading Files from Other Stats Programs
+  Module includes link for how to download other forms of data into R, including datasets and outputs from other stats packages such as SAS, Stata, and SPSS. Module includes a link for interfacing between MATLAB and R, which also uses the {R.matlab} package.
