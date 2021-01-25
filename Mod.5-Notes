@@ -42,7 +42,9 @@ Reading from a local file
   tail(d): shows to last 6 lines of data for all columns.
   class(d): shows that tables are typically loaded as dataframes.
   Alternatively; d <- read.delim(f, header = TRUE, stringsAsFactors = FALSE); then head(d)
-  Loading comma-separated {.csv} text: f<-file.choose("~/OneDrive/Documents/Github/Module-4/CPDSc"); d<-read.table(f, header = TRUE, sep = ",", stringsAsFactors = FALSE) OR d<-read.csv(f, header = TRUE, stringsAsFactors = FALSE)
+  Loading comma-separated {.csv} text: 
+    f<-file.choose("~/OneDrive/Documents/Github/Module-4/CPDSc");
+    d<-read.table(f, header = TRUE, sep = ",", stringsAsFactors = FALSE) OR d<-read.csv(f, header = TRUE, stringsAsFactors = FALSE)
   
 Loading Excel Files
   While you should never need to use Excel, sometimes you will no doubt be given a spreadsheet file with some data in it that you want to read in R. There are several packages available that provide functions for loading data into R from Excel spreadsheet files: {readxl}, {XLConnect}, {gdata}, and {xlsx}. The first two of these are fast, easy to use, and work well. {gdata} is a bit slower and requires that you have PERL installed someone on your computer (which it is likely to be by default). {xlsx} is much slower.

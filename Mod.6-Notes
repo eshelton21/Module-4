@@ -1,0 +1,55 @@
+Module 6 Notes
+Preliminaries: 
+  Save CountryData2016.csv and KamiliarAndCooperData.csv to local files. Install {dplyr} and {ggplot2} packages; they're part of the {tidyverse}, which can be installed as a shorthand for it.
+
+Backstory:
+  R has functions that take a quick tour of the data, eg head(), tail(), and str(), and they should always be used right after loading a dataset to work with. Other functions are dim(), which returns the number of rows and columns in a dataframe; names(); colnames(), and sometimes rownames(). 
+  You can also use the attach() function to make variables within dataframes accessible in R with a few keystrokes. The function binds the variables from the dataframe names as an argument to the local namespace so that as long as the dataframe is attached, variables can be called by their names without explicitly referring to the dataframe. For example, if you attach() a dataframe, then you don't need to use the $ operator or bracket notation to refer to a particular variable. It's important to remember to detach() dataframes when finished. It's also possible to attache multiple dataframes, and the same dataframe multiple times, and, if these share variable names, then the more recently attached one will mask the other. Therefore it's best to attach only one dataframe at a time, or none at all. 
+  The with() function accomplishes much the same thing as attach(), but is self-contained and cleaner, especially for use in functions. If you use with(), all code to be run should be included as an argument of the function.
+  
+Some Useful Procedures for Exploratory Data Analysis
+Univariate data:
+  The summary() function provides a quick overview of each column in a dataframe. For numeric variables, this includes the minimum, 25th percentile, median, mean, 75th percentile, and maximum of the data, as well as a count of NA, missing values. For factors, it includes a count of each factor. 
+  Load the CountryData2016 dataset into a dataframe variable, d, and summarize the variables in that dataframe. 
+  Module:
+    library(curl)
+    f<-curl("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/master/AN597_Fall19/Country-Data-2016.csv")
+    d<-read.csv(f, header = TRUE, sep = ",", stringsAsFactors = FALSE)
+    head(d)
+  What I did (reading from local file):
+    f<-file.choose("~/OneDrive/Documents/Github/Module-4/CountryData2016.csv")
+    d<-read.csv(f, header = TRUE, stringsAsFactors = FALSE)
+    head(d)
+  summary(d)
+    ETA: All the variables were characters, so the summary didn't return the mean/etc. Using the module's curl() function, the summary(d) returned the numerical data.
+  names(d): returns the category names.
+  What are the median area and population size of all countries in the dataset? Hint: There are a couple of was to do this; try summary() and median(). For the latter, you'll need to use the na.rm = TRUE argument. What I did: summary(d[2:3]); this gave me all the summary data for population and area, including medians. Population median: 4.912e+06. Area median: 69700.
+  Create a new 'pop_density' variable in your dataframe, which is population/area. What are the ten most and ten least dense countries? Hint: check out the order() function.
+    d$density<-d$population/d$area: sets the density variable in the dataframe.
+    d<-d[order(-d$density),]: organizes d according to density, from most to least.
+    d[1:10,]: returns all the variable data for the ten most dense countries.
+    d<-d[order(d$density),]: organizes d according to density, from least to most.
+    d[1:10,]: returns all the variable data for the ten least dense countries.
+  Extract data from the 20 largest countries into a new variable. What are the median area and population sizes of these countries?
+  Extract data from all countries beginning with the letters 'A' through 'F'. What are the mean area and population sizes of these countries?
+    new <- d[grep("^[A-F]", d$country),]: this sets up 'new' as all the countries beginning with A-F.
+    summary(new): returns all the summary data of the countries in 'new', which is 78 countries.
+    Alternatively: mean(new$population, na.rm = TRUE); mean(new$area, na.rm = true).
+Graphs: 
+  Boxplots: the boxplot() function provides a box-and-whiskers visual representation of the five-number summary plus outliers that go beyond the bulk of the data. The function balks if you pass it non-numeric data, so you may need to reference columns specifically using bracket notation or the $ operator.
+  Barplots: the barplot() function is useful for crude data, with bar height proportional to the value of the variable. The dotchart() function provides a similar graphical summary.
+  Make boxplots of the raw population and area data, then do the same after log() transforming these variables. Note: the par() command will let you set up a grid of panel in which to plot. The module sets up a two row by three column grid. ETA: all of these should be input at the same time.
+    par(mfrow = c(2,3))
+    boxplot(d$population)
+    boxplot(log(d$population))
+    boxplot(d$area)
+    boxplot(log(d$area))
+    barplot(d$population)
+    barplot(d$area)
+    ETA: I got an error message of: Error in plot.new() : figure margins too large. Looked on the stackoverflow website; it said I should check the margins using par("mar"), which should return [1] 5.1 4.1 4.1 2.1; it did. The site said to input par(mar = c(1,1,1,1)) to change the margins; I did and it worked. I also got a warning message of: In x[floor(d)] + x[ceiling(d)] : NAs produced by integer overflow; this did not prevent the plots from appearing, so I ignored it.
+  Histograms: the hist() function returns a histogram showing the complete empirical distribution of the data in binned categories, which is useful for checking skewwness of the data, symmetry, multi-modality, etc. Setting the argument freq=FALSE will scale the Y-axis to represent the proportion of observations falling into each bin rather than the count. Make histograms of the log() transformed population and area data from the Country-Data-2016 file. Explore what happens if you set freq=FALSE or freq=TRUE. Try looking at other variables.
+    par(mfrow = c(1,2)): this sets up two panels.
+    attach(d)
+    hist(log(population), freq = FALSE, col = "red", main = "Plot 1", xlab = "log(population size", ylab = "density", ylim = c(0, 0.2))
+    hist(log(area), freq = FALSE, col = "red", main = "Plot 2", xlab = "log(area)", ylab = "density", ylim = c(0, 0.2))
+    Note: you can add a line to your histograms, eg to show the mean value for a variable, using the abline() command, with arguments. For example, to show a single vertical line representing the mean log(population size), you would add the argument v=mean(log(population)).
