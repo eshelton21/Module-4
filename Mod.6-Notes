@@ -53,3 +53,92 @@ Graphs:
     hist(log(population), freq = FALSE, col = "red", main = "Plot 1", xlab = "log(population size", ylab = "density", ylim = c(0, 0.2))
     hist(log(area), freq = FALSE, col = "red", main = "Plot 2", xlab = "log(area)", ylab = "density", ylim = c(0, 0.2))
     Note: you can add a line to your histograms, eg to show the mean value for a variable, using the abline() command, with arguments. For example, to show a single vertical line representing the mean log(population size), you would add the argument v=mean(log(population)).
+  Density plot: the density() function computes a non-parametric estimate of the distribution of a variable, which can be combined with plot() to also yield a graphical view of the distribution of the data. If your data has missing values, then you need to add the argument na.rm=TRUE to density(). To superimpose a density() curve on a histogram, you can use the lines(denisty()) function.
+    par(mfrow = c(1,1)): this sets up one panel and redraws the log(population) histogram. ETA: There were a lot of error messages after this line but after nine of them the other lines of code ran and the plot ended up matching the module's so whatever.
+    hist(log(population), freq = FALSE, col = "white", main = "My Plot with Mean and Density", xlab = "log(population size)", ylab = "density", ylim = c(0, 0.2))
+    abline(v = mean(log(population), na.rm = TRUE), col = "blue")
+    lines(density(log(population), na.rm = TRUE), col = "green")
+  detach(d)
+  Tables: the table() function can be used to summarize counts and proportions for categorical variables in your dataset. Using the table() function, find the most common form of government in the Country-Data-2016 dataset. How many countries have that form? Hint: We can combine table() with sort() and the argument decreasing=TRUE to get the answer immediately.
+    sort(table(d$govt_form), decreasing = TRUE)
+    Answer: 'republic', with 127.
+    
+For Multivariate Data:
+  Multiple boxplots or histograms can be laid out side-by-side or overlaid. For boxplots, the ~ operator can be read as 'by'. Read in the dataset KamiliarAndCooperData, which contains a host of summary information about 213 primate species. Spend some time exploring the data and then make boxplots of log(female body mass)~family. Try doing this with {base} graphics and then look at how we might to it in {ggplot2}, which provides a standard 'grammar of graphics', explained in a link in the Module.
+    f<-curl("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/master/AN597_Fall19/KamilarAndCooperData.csv")
+    d<-read.csv(f, header = TRUE, stringsAsFactors = FALSE)
+    attach(d)
+    head(d)
+Plotting using {base} graphics:
+  boxplot(log(Body_mass_female_mean)~Family, d): error message: Error in plot.new() : figure margins too large. Issue was resolved using the solution found above at line 49; the figure appeared, but was missing the labels found in the Module. I set par(mar=c(5.1,4.1,4.1,2.1)) and ran the code again with RStudio fullscreen and the plots window larger. I got no error message and the figure appeared with labels.
+  detach(d)
+Alternatively, plotting using {ggplot2}:
+  library(ggplot2)
+  p<-ggplot(data = d, aes(x = Family, y = log(Body_mass_female_mean)))
+  p<- p + geom_boxplot()
+  p<- p + theme(axis.text.x = element_text(angle = 90))
+  p<- p + ylab("log(Female Body Mass)")
+  p: returned a graph that matched the module's, as well as a warning message; Removed 18 rows containing non-finite values (stat_boxplot).
+
+Scatterplots: 
+  A natural tool for visualizing two continuous variables and can be made easily with the plot(x=XXX, y=YYY) function in {base} graphics, where XXX and YYY denote the names of the two variables you're plotting. Transformations of the variables, eg log or square-root [sqrt()], may be necessary for effective visualization. Again using data from the KamiliarAndCooper dataset, plot the relationship between female body size and female brains size. Then play with log transforming the data and plot again.
+    attach(d)
+    par(mfrow=c(1,2))
+    plot(x = Body_mass_female_mean, y = Brain_Size_Female_Mean)
+    plot(x = log(Body_mass_female_mean), y = log(Brain_Size_Female_Mean))
+    detach(d)
+  The grammar for {ggplot2} is a bit more complicated.
+    p<-ggplot(data = d, aes(x = log(Body_mass_female_mean), y = log(Brain_Size_Female_Mean), color = factor(Family))): first, we build a plot object and color points by family.
+    p<- p + xlab("log(Female Body Mass)") + ylab("log(Female Brain Size)"): then we modify the axis labels.
+    p<- p + geom_point(): then we make a scatterplot.
+    p<- p + theme(legend.position = "bottom", legend.title = element_blank()): then we modify the legend.
+    p: finally, we plot the object.
+    ETA: the scatterplot matched the module's. There was also a warning message; Removed 48 rows containing missing values (geom_point).
+  Using {ggplot2}, we can also easily set up a grid for 'faceting' by a grouping variable:
+    p<- p + facet_wrap(~Family, ncol = 4)
+    p<- p + theme(legend.position = "none")
+    p: this returns one scatterplot for each Family variable.
+  And we can easily add regression lines to our plot. Here, we add a linear model to each facet.
+    p<- p + geom_smooth(method = "lm", fullrange = TRUE)
+    p: returns all the Family scatterplots with lines of best fit. ETA: didn't plot the lines, returned this message: geom_smooth: na.rm = FALSE, orientation = NA, se = TRUE stat_smooth: na.rm = FALSE, orientation = NA, se = TRUE, fullrange = TRUE, method = lm position_identity.
+  Build your own bivariate scatterplot using the KamiliarAndCooper dataset:
+    p<- ggplot(data = d, aes(x = log(Body_mass_female_mean), y = log(MaxLongevity_m)))
+    p<- p + geom_point()
+    p<- p + geom_smooth(method = "lm")
+    p: returned a graph that matched the module's. Returned this message: `geom_smooth()` using formula 'y ~ x'. Returned these warning messages: 1: Removed 72 rows containing non-finite values (stat_smooth). 
+2: Removed 72 rows containing missing values(geom_point).
+
+Aggregate Stats and the {dplyr} Package
+  To calculate summary stats for groups of observations in a dataframe, there are many different approaches. One is to use the aggregate() function from the {stats} package, whcih provides a quick way to look at summary stats for sets of observations, though it requires a bit of clunky code. Here, we apply a particular function (FUN="mean") to mean female body mass, grouped by Family.
+    aggregate(d$Body_mass_female_mean~d$Family, FUN = "mean", na.rm = TRUE)
+    OR: aggregate(x = d["Body_mass_female_mean"], by= d["Family"], FUN = "mean", na.rm = TRUE)
+  Another easier way to summarize data is to use the package {dplyr}, which provides 'a flexible grammar of data manipulation' that includes a set of verbs that can be used to perform useful operations on dataframes. 
+    library(dplyr)
+    s<- filter(d, Family == "Hominidae" & Mass_Dimorphism > 2)
+    head(s): filtering a dataframe for certain rows.
+    s<- arrage(d, Family, Genus, Body_mass_male_mean): rearranging a dataframe.
+    head(s)
+    s<- select(d, Family, Genus, Body_mass_male_mean)
+    head(s): returns the first six lines of those selected columns.
+    s<- rename(d, "Female_Mass" = Body_mass_female_mean)
+    head(s$Female_Mass): renaming columns.
+    s<- mutate(d, "Binomial" = paste(Genus, Species, sep = " "))
+    head(s$Binomial): adding new columns.
+  The {dplyr} package also makes it easy to summarize data using more convenient functions than aggregate(). For example:
+    s<- summarise(d, avgF = mean(Body_mass_female_mean, na.rm = TRUE), avgM = mean(Body_mass_male_mean, na.rm = TRUE))
+    s: returns the average of those columns.
+  The group_by() function allows us to apply summary functions to sets of observations defined by a categorical variable, as we did above with aggregate().
+    byFamily<- group_by(d, Family)
+    byFamily: returns a 213x44 tibble.
+    s<- summarise(byFamily, avgF = mean(Body_mass_female_mean, na.rm = TRUE), avgM = mean(Body_mass_male_mean, na.rm = TRUE))
+    s: returns a 14x3 tibble.
+
+Piping:
+  One other cool thing about the {dplyr} package is that is provides a convenient way to pipe together operations on a dataframe using the %>% operator. Although this may at first seem cumbersome, it will quickly become one of the best ways to make your code simpler and more readable.
+  In one line of code, do the following: add a variable 'Binomial' to dataframe d, which is a concatenation [linking things together in a series] of the Genus and Species; trim the dataframe to only include the variables Binomial, Family, Body_mass_female_mean, Body_mass_male_mean, and Mass_Dimorphism; group these by Family; calculate the average value for female body mass, male body mass, and mass dimorphism.
+    s<- d %>%
+      mutate(Binomial = paste(Genus, Species, sep = " ")) %>%
+      select(Binomial, Family, Body_mass_female_mean, Body_mass_male_mean, Mass_Dimorphism) %>%
+      group_by(Family) %>%
+      summarise(avgF = mean(Body_mass_female_mean, na.rm = TRUE), avgM = mean(Body_mass_male_mean, na.rm = TRUE), avgBMD = mean(Mass_Dimorphism, na.rm = TRUE))
+    s: returns a 14x4 tibble.
