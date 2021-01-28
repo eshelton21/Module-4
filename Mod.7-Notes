@@ -1,0 +1,45 @@
+Module 7
+Preliminaries: 
+  Install package {sciplot}.
+Objectives:
+  This module's objective is to introduce the fundamental concepts of central tendency and variane, which are crucial for describing data and for statistical hypothesis testing.
+Important terms:
+  Population: includes all of the elements from a set of data, eg all of the vervet monkeys in the world, = N
+  Sample: one or more observations frm a population, eg the set of vervets living in South Africa, the set of vervet skeletons found in a museum, = n
+  Parameter: a measureable characteristic of a population, eg the mean value of the femur length of all vervets.
+  Statistics: a measureable characteristic about a sample, eg the mean femur length of vervet monkey femurs found at the American Museum of Natural History.
+
+Describing Sets of Observations or Measurements
+  It is important for us to be able to describe the general characteristics of a set of observations or measurements about a population or a sample, and two common ways are to calculate some measure of central tendency and some measure of spread.
+
+Measures of Central Tendency:
+  Mode: most common measurement of values observed.
+  Median: middle value in a rank ordered series of values.
+  Mean: the sum of measured values divided by n, the average or the arithemetic mean.
+  These measures are relevant to summarizing observations about processes that are additive.
+    Harmonic mean: the reciprocal of the average of the reciprocals of a set of values.
+    Geometric mean: a measure of central tendency for processes that are multiplicative rather than additive, the nth root of the product of the values; for the mathematically inclines, it also equals the antilog of the averaged log values.
+  Given a vector, x<- c(1,2,3,4,5,6,7,8,9,10,100,1000), write a function to determine the geometric man of the values in a vector. Remember the general form for functions is: function name<- function(arguments to pass){code to run}.
+    x<- c(1,2,3,4,5,6,7,8,9,10,25,50,100,200,1000)
+    gm1<- function(x){prod(x)^(1/length(x))}
+    gm1(x): returns 13.50559
+    gm2<- function(x){exp(mean(log(x)))}
+    gm2(x): returns 13.50559
+  What happens if you have NAs or zeros or negative numbers in the vectors? Hint: the argument na.rm=TRUE and the function na.omit() may help you write more generic functions.
+  
+Measures of Spread:
+  A measure of spread or variability in a dataset is one of the most important summary statistics to calculate. The range, min to max, is one measure of spread as is the interquartile range, 25th to 75th quartile. As we've seen, these are returned by the summary() function. We commonly characterize spread, however, in terms of the deviation of values from the mean. One such measure is: 
+  The sum of squares: the sum of the squared deviations of a set of values from the mean. We use the sum of the squared deviations instead of just the sum of deviations because the latter would simply be zero.
+  Write a function to calculate the sum of squares for a vector:
+    ssl<- function(x){sum((x-mean(x))^2)}
+    ssl(x): returns 917183.3
+  This is equivalent to:
+    ss2<- function(x){sum(x^2)-length(x)*mean(x)^2}
+    ss2(x): returns 917183.3
+  A shortcut to calculate the sum of squares that does not require calculating mean(x) is the (sum of the squared values in the dataset) minus the (square of the summed values/n). Thus, another formula for the sum of squares is:
+    ss3<- function(x){sum(x^2)-(sum(x))^2/length(x)}
+    ss3(x): returns 917183.3
+  The sum of squares increases with sample size. You can see this by adding more data points to your vector. To be able to compare across datasets, we are then more interested in the average deviation of values from the mean rather than the straight sum of squares, ie, a mean squared deviation. This is the definition of the variability or variance in a dataset. If we are simply interested in describing the mean squared deviation in a population, where we have a value or measurement for every case, eg the femur length of all the vervet monkeys in a museum population, we could then just divide the sum of squares by the number of cases. Population variance = sum of squares/N. 
+    pop_v<- function(x){sum((x-mean(x))^2)/(length(x))}
+    pop_v(x): returns 61145.56
+    
